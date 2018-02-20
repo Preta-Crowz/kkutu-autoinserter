@@ -19,10 +19,11 @@ def inputWord(db,word,callback=None):
         print('new word data: ')
         print(word)
         i = db.execute('SELECT * FROM public.kkutu_ko WHERE _id = %s', %(word.id))
+        dbword = i[0]
         print('default word data: ')
-        print(i[0])
+        print(dbword)
 
-        if not i[0]
+        if not dbword
             thisOffset = 0
             OffsetSetting = True
             while OffsetSetting:
@@ -38,7 +39,7 @@ def inputWord(db,word,callback=None):
             db.execute('INSERT INTO public.kkutu_ko (_id, type, mean, flag, theme) VALUES (%s, %s, %s, %s, %s)', %(word.id, word.type, word.mean, word.flag, word.theme))
             if config['test']: print('INSERT INTO public.kkutu_ko (_id, type, mean, flag, theme) VALUES (' + word.id + ', ' +word.type + ', ' + word.mean + ', ' + word.flag + ', ' + word.theme + ')')
         else:
-            themeOffset = i[0]['theme'].count(',')
+            themeOffset = dbword['theme'].count(',')
             thisOffset = 1
             OffsetSetting = True
             while OffsetSetting:
@@ -50,10 +51,10 @@ def inputWord(db,word,callback=None):
                         word['mean'] = '"' + str(themeOffset + thisOffset) + '"' + word['mean'][5:]
                     else:
                         word['mean'] = word['mean'][:word['mean'].find('/mean')] + '"' + str(themeOffset + thisOffset) + '"' + word['mean'][word['mean'].find('/mean') + 5:]
-            print(i[0]['mean'] != word['mean'])
-            if (i[0]['type'] != word['type']) or (i[0]['mean'] != word['mean']) or (i[0]['theme'] != word['theme']):
-                db.execute('UPDATE public.kkutu_ko SET type=%s, mean=%s, theme=%s WHERE _id = %s' %(i[0]['type'] + ',' + word['type'],i[0]['mean'] + '  ' + word['mean'],i[0]['theme'] + ',' + word['theme'],word['id']))
-                if config['test']: print('UPDATE public.kkutu_ko SET type=' + i[0]['type'] + ',' + word['type'] + ', mean=' + i[0]['mean'] + '  ' + word['mean'] + ', theme=' + i[0]['theme'] + ',' + word['theme'] + ' WHERE _id = ' + word['id'])
+            print(dbword['mean'] != word['mean'])
+            if (dbword['type'] != word['type']) or (dbword['mean'] != word['mean']) or (dbword['theme'] != word['theme']):
+                db.execute('UPDATE public.kkutu_ko SET type=%s, mean=%s, theme=%s WHERE _id = %s' %(dbword['type'] + ',' + word['type'],dbword['mean'] + '  ' + word['mean'],dbword['theme'] + ',' + word['theme'],word['id']))
+                if config['test']: print('UPDATE public.kkutu_ko SET type=' + dbword['type'] + ',' + word['type'] + ', mean=' + dbword['mean'] + '  ' + word['mean'] + ', theme=' + dbword['theme'] + ',' + word['theme'] + ' WHERE _id = ' + word['id'])
             else: print('same word. not update.')
         return
     except:
@@ -65,5 +66,5 @@ try:
     print('success')
     i = db.execute('SELECT * FROM public.kkutu_ko WHERE _id = %s' %(word.id))
     print('inputed data: ')
-    print(i[0])
+    print(dbword)
 except: print('Warning : Error!')
